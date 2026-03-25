@@ -61,6 +61,12 @@ public class ProductController {
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
     
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductDTO>> searchProducts(@RequestParam String query) {
+        List<ProductDTO> products = productService.searchProducts(query);
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+    
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);

@@ -70,6 +70,15 @@ public class ProductService {
         productRepository.deleteById(id);
     }
     
+    public List<ProductDTO> searchProducts(String query) {
+        String searchQuery = query.toLowerCase();
+        return productRepository.findAll().stream()
+                .filter(p -> p.getProductName().toLowerCase().contains(searchQuery) || 
+                            p.getProductCode().toLowerCase().contains(searchQuery))
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+    
     private ProductDTO convertToDTO(Product product) {
         return new ProductDTO(
             product.getId(),
