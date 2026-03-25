@@ -1,6 +1,7 @@
 package com.inventory.inventory.management.controller;
 
 import com.inventory.inventory.management.dto.InventoryDTO;
+import com.inventory.inventory.management.dto.StatisticsDTO;
 import com.inventory.inventory.management.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -81,5 +82,11 @@ public class InventoryController {
     public ResponseEntity<Map<String, Boolean>> checkStockAvailability(@PathVariable Long productId, @PathVariable Integer quantity) {
         Boolean isAvailable = inventoryService.isStockAvailable(productId, quantity);
         return new ResponseEntity<>(Map.of("available", isAvailable), HttpStatus.OK);
+    }
+    
+    @GetMapping("/statistics")
+    public ResponseEntity<StatisticsDTO> getStatistics() {
+        StatisticsDTO statistics = inventoryService.getStatistics();
+        return new ResponseEntity<>(statistics, HttpStatus.OK);
     }
 }

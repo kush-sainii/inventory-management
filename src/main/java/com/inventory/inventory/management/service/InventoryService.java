@@ -1,6 +1,7 @@
 package com.inventory.inventory.management.service;
 
 import com.inventory.inventory.management.dto.InventoryDTO;
+import com.inventory.inventory.management.dto.StatisticsDTO;
 import com.inventory.inventory.management.entity.Inventory;
 import com.inventory.inventory.management.entity.Product;
 import com.inventory.inventory.management.repository.InventoryRepository;
@@ -92,6 +93,42 @@ public class InventoryService {
     public Boolean isStockAvailable(Long productId, Integer quantity) {
         Optional<Inventory> inventory = inventoryRepository.findByProductId(productId);
         return inventory.isPresent() && inventory.get().getQuantity() >= quantity;
+    }
+    
+    public StatisticsDTO getStatistics() {
+        List<Inventory> allInventory = inventoryRepository.findAll();
+        
+        if (allInventory.isEmpty()) {
+            return new StatisticsDTO(0.0, 0, 0.0, null, null);
+        }
+        
+        // Calculate total inventory value
+        Double totalValue = allInventory.stream()
+                .mapToDouble(inv -> inv.getQuantity() * inv.getProduct().getPrice())
+                .sum();
+        
+        // Total number of products
+        Integer totalProducts = allInventory.size();
+        
+        // Average stock level
+        Double averageStock = allInventory.stream()
+                .mapToDouble(Inventory::getQuantity)
+                .average()
+                .orElse(0.0);
+        
+        // Most stocked item
+        InventoryDTO mostStocked = allInventory.stream()
+                .max((a, b) -> a.getQuantity().compareTo(b.getQuantity()))
+                .map(this::convertToDTO)
+                .orElse(null);
+        
+        // Least stocked item
+        InventoryDTO leastStocked = allInventory.stream()
+                .min((a, b) -> a.getQuantity().compareTo(b.getQuantity()))
+                .map(this::convertToDTO)
+                .orElse(null);
+        
+        return new StatisticsDTO(totalValue, totalProducts, averageStock, mostStocked, leastStocked);
     }
     
     private InventoryDTO convertToDTO(Inventory inventory) {
